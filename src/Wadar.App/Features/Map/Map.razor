@@ -1,0 +1,36 @@
+@using System.Threading
+
+<div id="map" class="map"></div>
+
+@code {
+    [Inject]
+    protected IJSRuntime JsRuntime { get; set; }
+
+    [Parameter]
+    public MapState State {get; set;}
+
+    public MapState PreviousState {get; set;}
+
+    public bool Loading {get; set;} = true;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if(!firstRender)
+            return;
+
+        JsRuntime.InvokeVoidAsync("initializeMap", CancellationToken.None, "map", State.Longitude, State.Latitude, State.Zoom);
+        Loading = false;
+    }
+
+    // NOTE: This works good for 1 Parameter. Maybe needs adjusting for more
+    // We can assume this means our MapState was updated
+    protected override async Task OnParametersSetAsync()
+    {
+        if(Loading || PreviousState == State)
+            return;
+
+        await JsRuntime.InvokeVoidAsync("UpdateLocation", State);
+        PreviousState = State;
+
+    }
+}

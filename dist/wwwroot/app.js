@@ -31,11 +31,11 @@ function Step(time)
     layers[1].getSource().updateParams({'TIME': date.toISOString()});
 }
 
-function UpdateLocation(location)
+function UpdateLocation(state)
 {
     const view = map.getView();
-    view.setCenter(ol.proj.fromLonLat([location.longitude, location.latitude]));
-    view.setZoom(10);
+    view.setCenter(ol.proj.fromLonLat([state.longitude, state.latitude]));
+    view.setZoom(state.zoom);
 }
 
 function initializeMap(targetElementId, longitude, latitude, zoom){

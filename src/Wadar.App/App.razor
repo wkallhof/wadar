@@ -1,76 +1,17 @@
 ﻿@using System.Threading
+@using Wadar.App.Features.Map
 
 <div class="page">
     <div class="main">
         <div class="content px-4">
 
-            <Radar />
+            <Radar Zip="@Zip"/>
 
             <input type="text" @bind="Zip"/>
-            <button @onclick="Locate">Locate</button>
-
-            <span>Time : @HumanDateTime</span>
-            <span>Index : @TimeStopIndex</span>
         </div>
     </div>
 </div>
 
 @code {
-    [Inject]
-    protected IJSRuntime JsRuntime { get; set; }
-    [Inject]
-    protected NOAAWeatherService WeatherService {get; set; }
-    [Inject]
-    protected GeolocationService GeolocationService {get; set; }
-
-    private string HumanDateTime {get; set;}
-
     private string Zip {get; set;} = "55060";
-
-    private int TimeStopIndex = 0;
-
-    private List<DateTimeOffset> TimeStops = new List<DateTimeOffset>();
-    private Timer Timer;
-
-
-    private async Task Step()
-    {
-        TimeStopIndex = TimeStopIndex == TimeStops.Count()-1 ? 0 : TimeStopIndex + 1;
-        HumanDateTime = (DateTime.Now - TimeStops[TimeStopIndex]).Humanize(2);
-        await JsRuntime.InvokeVoidAsync("Step", TimeStops[TimeStopIndex].ToUnixTimeMilliseconds());
-    }
-
-    public async Task Locate()
-    {
-        var result = await GeolocationService.GetLatLongByZip(Zip);
-        if(result == null)
-            return;
-
-        await JsRuntime.InvokeVoidAsync("UpdateLocation", result);
-    } 
-
-    protected override async Task OnInitializedAsync()
-    {
-        
-        await LoadTimeStops(TimeSpan.FromHours(1));
-
-        Timer = new Timer(async (object stateInfo) =>
-		{
-			await Step();
-			StateHasChanged();
-		}, new AutoResetEvent(false), 1000, 1000);
-    }
-
-    private async Task LoadTimeStops(TimeSpan limit)
-    {
-        var allTimeStops = await WeatherService.GetTimeStops();
-        TimeStops = allTimeStops.Where(x => (DateTime.Now - x) <= limit).ToList();
-        TimeStopIndex = TimeStops.Count() - 1;
-    }
-
-    protected override void OnAfterRender(bool firstRender)
-    {
-        if (firstRender)
-            JsRuntime.InvokeVoidAsync("onBlazorReady");
-    }
 }

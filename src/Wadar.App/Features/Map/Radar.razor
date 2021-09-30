@@ -1,0 +1,91 @@
+@using System.Threading
+
+<div>
+    @if(!Loading)
+    {
+        <Map State="@MapState" />
+        <span>Time : @HumanDateTime ago</span>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string Zip {get; set;}
+
+    [Inject]
+    protected IJSRuntime JsRuntime { get; set; }
+    [Inject]
+    protected NOAAWeatherService WeatherService {get; set; }
+    [Inject]
+    protected GeolocationService GeolocationService {get; set; }
+
+    private string HumanDateTime {get; set;}
+
+    public MapState MapState {get; set;}
+
+    public bool Loading {get; set;} = true;
+
+    private int TimeStopIndex = 0;
+
+    private List<DateTimeOffset> TimeStops = new List<DateTimeOffset>();
+    private Timer StepTimer;
+    private Timer TimeStopLoadTimer;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadTimeStops(TimeSpan.FromHours(1));
+
+        var result = await GeolocationService.GetLatLongByZip(Zip);
+        MapState = new MapState(){
+            Longitude = Decimal.Parse(result.Longitude),
+            Latitude = Decimal.Parse(result.Latitude),
+            Zoom = 10
+        };
+
+        StepTimer = new Timer(async (object stateInfo) =>
+		{
+			await Step();
+			StateHasChanged();
+		}, new AutoResetEvent(false), 1000, 1000);
+
+        TimeStopLoadTimer = new Timer(async (object stateInfo) =>
+		{
+			await LoadTimeStops(TimeSpan.FromHours(1));
+			StateHasChanged();
+		}, new AutoResetEvent(false), 10000, 10000);
+
+        Loading = false;
+    }
+
+    // NOTE: This works good for 1 Parameter. Maybe needs adjusting for more
+    // We can assume this means our Zip was updated
+    protected override async Task OnParametersSetAsync()
+    {
+        if(Zip.Length != 5)
+            return;
+
+        var result = await GeolocationService.GetLatLongByZip(Zip);
+        if(result == null)
+            return;
+
+        MapState = new MapState(){
+            Longitude = Decimal.Parse(result.Longitude),
+            Latitude = Decimal.Parse(result.Latitude),
+            Zoom = 10
+        };    
+    }
+
+    private async Task LoadTimeStops(TimeSpan limit)
+    {
+        var allTimeStops = await WeatherService.GetTimeStops();
+        TimeStops = allTimeStops.Where(x => (DateTime.Now - x) <= limit).ToList();
+        TimeStopIndex = TimeStops.Count() - 1;
+    }
+
+    private async Task Step()
+    {
+        TimeStopIndex = TimeStopIndex == TimeStops.Count()-1 ? 0 : TimeStopIndex + 1;
+        HumanDateTime = (DateTime.Now - TimeStops[TimeStopIndex]).Humanize(2);
+        await JsRuntime.InvokeVoidAsync("Step", TimeStops[TimeStopIndex].ToUnixTimeMilliseconds());
+    }
+}
