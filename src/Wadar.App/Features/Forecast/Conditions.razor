@@ -1,0 +1,47 @@
+<div class="conditions">
+    <div class="description">@Description</div>
+    <div class="temperature">
+        @Temperature °F (Feels Like @FeelsLike)
+    </div>
+    <div class="wind">
+        @WindSpeedMiles 
+        
+        @if(WindGustMiles.HasValue)
+        {
+            <text> - @WindGustMiles</text>
+        }
+        mph @WindDirection16Point
+    </div>
+
+    @if(ChanceOfRain.HasValue)
+    {
+        <div class="rain">Rain: @ChanceOfRain %</div>
+    }
+    
+</div>
+
+@code {
+    [Parameter]
+    public string Description {get; set;}
+
+    [Parameter]
+    public float? Temperature {get; set;}
+
+    [Parameter]
+    public float? FeelsLike {get; set;}
+
+    [Parameter]
+    public float? ChanceOfRain {get; set;}
+
+    [Parameter]
+    public string WindDirection16Point { get; set; }
+
+    [Parameter]
+    public float? WindDirectionDegree { get; set; }
+
+    [Parameter]
+    public float? WindSpeedMiles { get; set; }
+
+    [Parameter]
+    public float? WindGustMiles { get; set; }
+}

@@ -1,0 +1,14 @@
+<div class="daily-forecast">
+    <div class="date">@Forecast.Date.ToString("dddd MMM dd ")</div>
+    <div class="hourly-list">
+        @foreach (var hourly in Forecast.Hourly)
+        {
+            <HourlyForecast Forecast="@hourly" />
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public WmkApiService.DailyForecast Forecast {get; set;}
+}

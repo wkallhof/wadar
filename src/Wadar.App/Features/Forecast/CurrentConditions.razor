@@ -1,0 +1,17 @@
+<div id="current-conditions">
+    <div class="date">Current Forecast for @Location.AreaName?.FirstOrDefault().Value @Location.Region?.FirstOrDefault().Value</div>
+    <Conditions
+        Description="@Forecast.WeatherDescription?.FirstOrDefault().Value"
+        Temperature="@Forecast.TemperatureF"
+        FeelsLike="@Forecast.FeelsLikeF"
+        WindDirection16Point="@Forecast.WindDirection16Point"
+        WindSpeedMiles="@Forecast.WindSpeedMiles"/>
+</div>
+
+@code {
+    [Parameter]
+    public WmkApiService.CurrentCondition Forecast {get; set;}
+
+    [Parameter]
+    public WmkApiService.NearestArea Location {get; set;}
+}

@@ -1,3 +1,88 @@
+:root {
+    --site-color-1: rgb(243, 240, 235);
+    --site-color-2: rgb(19, 19, 19);
+    --site-color-3: rgb(255, 52, 52);
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --site-color-1: rgb(19, 19, 19);
+        --site-color-2: rgb(241, 241, 241);
+        --site-color-3: rgb(255, 52, 52);
+    }
+
+    .color1 { fill: var(--site-color-1); }
+    .color2 { fill: var(--site-color-3); }
+    .color3 { fill: var(--site-color-1); }
+    .color4 { fill: var(--site-color-1); }
+}
+
+@media (prefers-color-scheme: light) {
+    .color1 { fill: var(--site-color-2); }
+    .color2 { fill: var(--site-color-3); }
+    .color3 { fill: var(--site-color-1); }
+    .color4 { fill: var(--site-color-1); }
+}
+
+body{
+    font-family: "Courier New", monospace;
+    color: var(--site-color-2);
+    background-color: var(--site-color-1);
+    height: 100%;
+    margin: 30px;
+}
+
+#app {
+    display: flex;
+    flex-direction: column;
+}
+
 #blazor-error-ui {
     display:none;
+}
+
+.hourly-list {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-content: flex-start;
+}
+
+.conditions {
+    padding: 10px;
+    border: 1px var(--site-color-2) solid;
+    margin: 10px;
+    font-size: 11px;
+}
+
+.conditions .description {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+input.zip {
+    margin-bottom: 20px;
+    padding: 10px;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: large;
+    width: 50px;
+}
+
+.radar,
+.map,
+#current-conditions,
+.daily-forecast {
+    margin-bottom: 20px;
+}
+
+.radar {
+    display: flex;
+    flex-direction: column;
+}
+
+.radar span{
+    text-align: center;
 }

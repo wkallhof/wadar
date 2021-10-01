@@ -1,0 +1,16 @@
+<div class="hourly-forecast">
+    <Conditions
+        Description="@Forecast.WeatherDescription?.FirstOrDefault().Value"
+        Temperature="@Forecast.TemperatureF"
+        FeelsLike="@Forecast.FeelsLikeF"
+        ChanceOfRain="@Forecast.ChanceOfRain"
+        WindDirection16Point="@Forecast.WindDirection16Point"
+        WindSpeedMiles="@Forecast.WindSpeedMiles"
+        WindGustMiles="@Forecast.WindGustMiles" />
+
+</div>
+
+@code {
+    [Parameter]
+    public WmkApiService.Hourly Forecast {get; set;}
+}

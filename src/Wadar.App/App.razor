@@ -1,17 +1,43 @@
 ﻿@using System.Threading
 @using Wadar.App.Features.Map
+@using Wadar.App.Features.Forecast
 
-<div class="page">
-    <div class="main">
-        <div class="content px-4">
+<input class="zip" type="text" value="@Zip" @onchange="OnZipInputChange"/>
 
-            <Radar Zip="@Zip"/>
+<Radar Zip="@Zip"/>
 
-            <input type="text" @bind="Zip"/>
-        </div>
-    </div>
-</div>
+@if(Forecast?.CurrentCondition?.FirstOrDefault() != null)
+{
+    <CurrentConditions Forecast="@Forecast.CurrentCondition.FirstOrDefault()" Location="@Forecast.NearestArea.FirstOrDefault()" />
+}
+
+@if(Forecast?.DailyForecast != null){
+    @foreach (var daily in Forecast.DailyForecast)
+    {
+        <DailyForecast Forecast="@daily"/>
+    }
+}
 
 @code {
+    [Inject]
+    protected WmkApiService WmkApi { get; set; }
+
+    private WmkApiService.GetForecastResponse Forecast {get; set;}
+
     private string Zip {get; set;} = "55060";
+
+    private bool Loading {get; set;} = true;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        Forecast = await WmkApi.GetForecast(Zip);
+        Loading = false;
+    }
+
+    public async Task OnZipInputChange(ChangeEventArgs e)
+    {
+        Zip = e.Value.ToString();
+        Forecast = await WmkApi.GetForecast(Zip);
+    }
 }

@@ -16,6 +16,7 @@ namespace Wadar.App
             builder.Services.AddScoped(sp => new HttpClient());
             builder.Services.AddTransient<NOAAWeatherService>();
             builder.Services.AddTransient<GeolocationService>();
+            builder.Services.AddTransient<WmkApiService>();
 
             await builder.Build().RunAsync();
         }
